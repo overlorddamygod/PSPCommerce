@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1705.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PSPCommerce", "PSPCommerce\PSPCommerce.csproj", "{43DC1B82-211C-4174-9C67-BDB79AA122B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43DC1B82-211C-4174-9C67-BDB79AA122B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43DC1B82-211C-4174-9C67-BDB79AA122B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43DC1B82-211C-4174-9C67-BDB79AA122B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43DC1B82-211C-4174-9C67-BDB79AA122B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C93693C-C333-449A-B770-AD8563EC8C56}
+	EndGlobalSection
+EndGlobal
