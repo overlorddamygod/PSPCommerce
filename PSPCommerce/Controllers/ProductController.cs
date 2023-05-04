@@ -56,7 +56,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,ImageUrl,Description,CreatedAt,UpdatedAt")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,ImageUrl,Description,ID")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +88,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,ImageUrl,Description,CreatedAt,UpdatedAt")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,ImageUrl,Description,ID")] Product product)
         {
             if (id != product.ID)
             {

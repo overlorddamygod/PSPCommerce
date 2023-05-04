@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PSPCommerce.Data;
 using PSPCommerce.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace PSPCommerce.Controllers
 {
     public class CartController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public CartController(ApplicationDbContext context)
+
+        public CartController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Cart
@@ -50,7 +54,7 @@ namespace PSPCommerce.Controllers
         public IActionResult Create()
         {
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description");
-            ViewData["UserID"] = new SelectList(_context.Set<User>(), "Id", "Id");
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Id");
             return View();
         }
 
@@ -59,7 +63,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,ProductID,Quantity,UserID,CreatedAt,UpdatedAt")] CartItem cartItem)
+        public async Task<IActionResult> Create([Bind("ProductID,Quantity,UserID,ID")] CartItem cartItem)
         {
             if (ModelState.IsValid)
             {
@@ -68,9 +72,45 @@ namespace PSPCommerce.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description", cartItem.ProductID);
-            ViewData["UserID"] = new SelectList(_context.Set<User>(), "Id", "Id", cartItem.UserID);
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Id", cartItem.UserID);
             return View(cartItem);
         }
+
+        [HttpPost("add")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(int productId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            var userId = user.Id;
+            var cartItem = await _context.CartItem.FirstOrDefaultAsync(ci => ci.UserID == userId && ci.ProductID == productId);
+
+            if (cartItem == null)
+            {
+                cartItem = new CartItem
+                {
+                    ProductID = productId,
+                    Quantity = 1,
+                    UserID = userId,
+                };
+
+                await _context.CartItem.AddAsync(cartItem);
+            }
+            else
+            {
+                cartItem.Quantity += 1;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Redirect("/");
+        }
+
 
         // GET: Cart/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -86,7 +126,7 @@ namespace PSPCommerce.Controllers
                 return NotFound();
             }
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description", cartItem.ProductID);
-            ViewData["UserID"] = new SelectList(_context.Set<User>(), "Id", "Id", cartItem.UserID);
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Id", cartItem.UserID);
             return View(cartItem);
         }
 
@@ -95,7 +135,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,ProductID,Quantity,UserID,CreatedAt,UpdatedAt")] CartItem cartItem)
+        public async Task<IActionResult> Edit(int id, [Bind("ProductID,Quantity,UserID,ID")] CartItem cartItem)
         {
             if (id != cartItem.ID)
             {
@@ -123,7 +163,7 @@ namespace PSPCommerce.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description", cartItem.ProductID);
-            ViewData["UserID"] = new SelectList(_context.Set<User>(), "Id", "Id", cartItem.UserID);
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Id", cartItem.UserID);
             return View(cartItem);
         }
 

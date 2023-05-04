@@ -5,7 +5,6 @@ namespace PSPCommerce.Models
 {
 	public class Favorites: BaseModel
 	{
-        public int ID { get; set; }
         public int ProductID { get; set; }
         public string UserID { get; set; }
 
