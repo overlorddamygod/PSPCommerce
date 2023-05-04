@@ -1,13 +1,29 @@
 @model PSPCommerce.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Name;
 }
 
 <h1>Details</h1>
 
 <div>
     <h4>Product</h4>
+
+    <div class="d-flex p-3 shadow rounded">
+        <img class="headset" src="@Model.ImageUrl" alt="@Model.Name" />
+
+        <div id="cart-text">
+            <button class="free-shipping">Free shipping</button>
+            <h2>@Model.Name</h2>
+            <h4>@Model.Description</h4>
+            <h1>Rs. @Model.Price</h1>
+
+            <form asp-controller="Cart" asp-action="Add" method="post" class="w-100">
+                <input type="hidden" value="@Model.ID" name="productId" />
+                <button type="submit" value="Add to Cart" class="add-to-cart">Add to Cart</button>
+            </form>
+        </div>
+    </div>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -23,6 +39,12 @@
             @Html.DisplayFor(model => model.ImageUrl)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
         <dd class = "col-sm-10">
@@ -31,11 +53,102 @@
     </dl>
 </div>
 <div>
-    @using (Html.BeginForm(new { controller = "Cart", action = "Add", method = FormMethod.Post }))
-    {
+    <form asp-controller="Cart" asp-action="Add" method="post" class="w-100">
         <input type="hidden" value="@Model.ID" name="productId" />
         <input type="submit" value="Add to Cart" class="btn btn-primary" />
-    }
+    </form>
     <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<style>
+.headset {
+  height: 11rem;
+}
+
+#cart-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.free-shipping {
+  font-family: "Lato", sans-serif;
+  color: #fff;
+  font-size: 0.65rem;
+  background-color: #191649;
+  border: 0;
+  border-radius: 0.9rem;
+  padding: 0.3rem 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-family: "Lato", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  margin-bottom: 2rem;
+  cursor:default;
+}
+
+h3 {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-size: 0.65rem;
+  text-decoration: line-through;
+  cursor:default;
+}
+
+h1 {
+  font-family: "Lato", sans-serif;
+  font-weight: 900;
+  cursor:default;
+  font-size: 2.5rem;
+}
+
+h4 {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-size: 0.7rem;
+  margin-bottom: 1rem;
+  cursor:default;
+}
+
+.add-to-cart {
+  width: 100%;
+  height: 2.7rem;
+  font-family: "Lato", sans-serif;
+  font-size: 1rem;
+  background-color: #4787e9;
+  color: #fff;
+  font-weight: 400;
+  border: 0;
+  border-bottom: 0.3rem solid #1e56ed;
+  border-radius: 0.4rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.add-to-cart:active {
+  border-bottom: 0;
+}
+
+.stock {
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 2rem;
+}
+
+h3 i {
+  color: #04d58b;
+  margin-right: 0.2rem;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+</style>

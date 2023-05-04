@@ -11,8 +11,8 @@ using PSPCommerce.Data;
 namespace PSPCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230504112343_user")]
-    partial class user
+    [Migration("20230504121427_product-cart-favorite")]
+    partial class productcartfavorite
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,19 +158,11 @@ namespace PSPCommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ProductID")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserID")
                         .IsRequired()
@@ -191,16 +183,8 @@ namespace PSPCommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ProductID")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserID")
                         .IsRequired()
@@ -221,10 +205,6 @@ namespace PSPCommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -237,9 +217,8 @@ namespace PSPCommerce.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Price")
+                        .HasColumnType("REAL");
 
                     b.HasKey("ID");
 
@@ -389,7 +368,7 @@ namespace PSPCommerce.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("PSPCommerce.Models.User", "_User")
-                        .WithMany()
+                        .WithMany("Favorites")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -402,6 +381,8 @@ namespace PSPCommerce.Data.Migrations
             modelBuilder.Entity("PSPCommerce.Models.User", b =>
                 {
                     b.Navigation("CartItems");
+
+                    b.Navigation("Favorites");
                 });
 #pragma warning restore 612, 618
         }

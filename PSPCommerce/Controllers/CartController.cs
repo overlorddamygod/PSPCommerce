@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PSPCommerce.Data;
 using PSPCommerce.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PSPCommerce.Controllers
 {
@@ -23,10 +24,12 @@ namespace PSPCommerce.Controllers
             _userManager = userManager;
         }
 
+        [Authorize]
         // GET: Cart
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.CartItem.Include(c => c._Product).Include(c => c._User);
+            var user = await _userManager.GetUserAsync(User);
+            var applicationDbContext = _context.CartItem.Where(cart=>cart.UserID == user.Id).Include(c => c._Product).Include(c => c._User);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -108,7 +111,7 @@ namespace PSPCommerce.Controllers
 
             await _context.SaveChangesAsync();
 
-            return Redirect("/");
+            return RedirectToAction("Index");
         }
 
 

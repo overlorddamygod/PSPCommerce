@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Index";
+
+    var totalPrice = Model.Sum(cart => cart._Product.Price * cart.Quantity);
 }
 
 <h1>Index</h1>
@@ -19,6 +21,9 @@
                 @Html.DisplayNameFor(model => model._User)
             </th>
             <th>
+                Price
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model._Product)
             </th>
             <th></th>
@@ -34,6 +39,9 @@
                 @Html.DisplayFor(modelItem => item._User.Id)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item._Product.Price)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item._Product.Description)
             </td>
             <td>
@@ -43,5 +51,16 @@
             </td>
         </tr>
 }
+
+
     </tbody>
+
 </table>
+<div>
+    Total Price: Rs.@totalPrice
+    @using (Html.BeginForm(new { controller = "Cart", action = "Add", method = FormMethod.Post }))
+    {
+        @* <input type="hidden" value="@item.ID" name="productId" /> *@
+        <input type="submit" value="Checkout" class="btn btn-primary" />
+    }
+</div>
