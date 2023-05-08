@@ -48,43 +48,34 @@
 
 }
 
-<h1>Index</h1>
+<h1>Cart</h1>
 
-<p>
+@* <p>
     <a asp-action="Create">Create New</a>
-</p>
+</p> *@
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model._User)
+                Product
             </th>
             <th>
                 Price
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model._Product)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr class="cart-row" data-id="@item.ID">
+        <tr class="cart-row" data-id="@item.ID" data-price="@item._Product.Price"> 
             <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item._User.Id)
+                @Html.DisplayFor(modelItem => item._Product.Name)
+                <p class="text-secondary">
+                  @Html.DisplayFor(modelItem => item._Product.Description)  
+                </p>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item._Product.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item._Product.Description)
             </td>
             <td>
                 <div>
@@ -111,7 +102,7 @@
 </table>
 
 <div>
-    Total Price: Rs.@totalPrice
+    <div>Total Price: Rs.<span id="total-price">@totalPrice</span></div>
 
     <input type="submit" value="Checkout" class="btn btn-primary" id="payment-button"/>
 </div>
