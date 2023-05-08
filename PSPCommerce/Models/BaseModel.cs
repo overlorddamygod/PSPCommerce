@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PSPCommerce.Models
 {
-	public class BaseModel
-	{
+    public class BaseModel
+    {
         public int ID { get; set; }
 
         // [DatabaseGenerated(DatabaseGeneratedOption.Computed)]

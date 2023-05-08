@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PSPCommerce.Models
 {
-	public class Favorites: BaseModel
-	{
+    public class Favorites : BaseModel
+    {
         public int ProductID { get; set; }
         public string UserID { get; set; }
 

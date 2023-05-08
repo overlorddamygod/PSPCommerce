@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PSPCommerce.Models
 {
-	public class CartItem: BaseModel
-	{
+    public class CartItem : BaseModel
+    {
         public int ProductID { get; set; }
         public int Quantity { get; set; }
         public string UserID { get; set; }
@@ -12,6 +12,6 @@ namespace PSPCommerce.Models
         public User _User { get; set; }
 
         public Product _Product { get; set; }
-	}
+    }
 }
 

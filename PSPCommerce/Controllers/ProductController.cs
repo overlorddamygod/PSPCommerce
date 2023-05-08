@@ -22,9 +22,9 @@ namespace PSPCommerce.Controllers
         // GET: Product
         public async Task<IActionResult> Index()
         {
-              return _context.Product != null ? 
-                          View(await _context.Product.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Product'  is null.");
+            return _context.Product != null ?
+                        View(await _context.Product.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.Product'  is null.");
         }
 
         // GET: Product/Details/5
@@ -150,14 +150,14 @@ namespace PSPCommerce.Controllers
             {
                 _context.Product.Remove(product);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
-          return (_context.Product?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Product?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

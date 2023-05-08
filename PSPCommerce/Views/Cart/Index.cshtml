@@ -6,6 +6,48 @@
     var totalPrice = Model.Sum(cart => cart._Product.Price * cart.Quantity);
 }
 
+@section scripts {
+    <script defer src="~/lib/jQuery-throttle-debounce/jQuery-throttle-debounce.js" asp-append-version="true"></script>
+    <script defer src="~/js/cart-index.js" asp-append-version="true"></script>
+    @* <script src="https://khalti.s3.ap-south-1.amazonaws.com/KPG/dist/2020.12.17.0.0.0/khalti-checkout.iffe.js"></script>
+    <script>
+        var config = {
+            // replace the publicKey with yours
+            "publicKey": "test_public_key_dc74e0fd57cb46cd93832aee0a390234",
+            "productIdentity": "1234567890",
+            "productName": "Dragon",
+            "productUrl": "http://gameofthrones.wikia.com/wiki/Dragons",
+            "paymentPreference": [
+                "KHALTI",
+                "EBANKING",
+                "MOBILE_BANKING",
+                "CONNECT_IPS",
+                "SCT",
+                ],
+            "eventHandler": {
+                onSuccess (payload) {
+                    // hit merchant api for initiating verfication
+                    console.log(payload);
+                },
+                onError (error) {
+                    console.log(error);
+                },
+                onClose () {
+                    console.log('widget is closing');
+                }
+            }
+        };
+
+        var checkout = new KhaltiCheckout(config);
+        var btn = document.getElementById("payment-button");
+        btn.onclick = function () {
+            // minimum transaction amount must be 10, i.e 1000 in paisa.
+            checkout.show({amount: @totalPrice});
+        }
+    </script> *@
+
+}
+
 <h1>Index</h1>
 
 <p>
@@ -31,7 +73,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        <tr class="cart-row" data-id="@item.ID">
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
             </td>
@@ -45,6 +87,17 @@
                 @Html.DisplayFor(modelItem => item._Product.Description)
             </td>
             <td>
+                <div>
+                    <div class="cart-buttons" data-id="@item.ID">
+                        <button id="decrement" class="btn btn-primary">
+                            -
+                        </button>
+                        <input type="number" style="width:5vw" id="cart-quantity" value="@item.Quantity" min="1" max="100">
+                        <button id="increment"  class="btn btn-primary">
+                            +
+                        </button>
+                    </div>
+                </div>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
@@ -56,11 +109,9 @@
     </tbody>
 
 </table>
+
 <div>
     Total Price: Rs.@totalPrice
-    @using (Html.BeginForm(new { controller = "Cart", action = "Add", method = FormMethod.Post }))
-    {
-        @* <input type="hidden" value="@item.ID" name="productId" /> *@
-        <input type="submit" value="Checkout" class="btn btn-primary" />
-    }
+
+    <input type="submit" value="Checkout" class="btn btn-primary" id="payment-button"/>
 </div>

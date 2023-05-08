@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +5,7 @@ using PSPCommerce.Data;
 using PSPCommerce.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using PSPCommerce.DTO;
 
 namespace PSPCommerce.Controllers
 {
@@ -16,12 +13,14 @@ namespace PSPCommerce.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
 
-        public CartController(ApplicationDbContext context, UserManager<User> userManager)
+        public CartController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _context = context;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [Authorize]
@@ -29,7 +28,7 @@ namespace PSPCommerce.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            var applicationDbContext = _context.CartItem.Where(cart=>cart.UserID == user.Id).Include(c => c._Product).Include(c => c._User);
+            var applicationDbContext = _context.CartItem.Where(cart => cart.UserID == user.Id).Include(c => c._Product).Include(c => c._User);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -79,7 +78,7 @@ namespace PSPCommerce.Controllers
             return View(cartItem);
         }
 
-        [HttpPost("add")]
+        [HttpPost("/cart/add")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int productId)
         {
@@ -114,6 +113,34 @@ namespace PSPCommerce.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost("/cart/setquantity")]
+        public async Task<IActionResult> SetQuantity([FromBody] SetQuantityDTO data)
+        {
+            if (!_signInManager.IsSignedIn(User))
+            {
+                return Unauthorized();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var cartItem = await _context.CartItem.Where(ci => ci.ID == data.id && ci.UserID == user!.Id).FirstOrDefaultAsync();
+
+            if (cartItem != null)
+            {
+                cartItem.Quantity = data.quantity;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
         // GET: Cart/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -204,14 +231,14 @@ namespace PSPCommerce.Controllers
             {
                 _context.CartItem.Remove(cartItem);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CartItemExists(int id)
         {
-          return (_context.CartItem?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.CartItem?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
