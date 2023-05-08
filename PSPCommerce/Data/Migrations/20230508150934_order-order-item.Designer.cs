@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PSPCommerce.Data;
 
@@ -10,9 +11,11 @@ using PSPCommerce.Data;
 namespace PSPCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230508150934_order-order-item")]
+    partial class orderorderitem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -229,8 +232,9 @@ namespace PSPCommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("OrderID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("OrderID")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("ProductID")
                         .HasColumnType("INTEGER");
@@ -238,11 +242,14 @@ namespace PSPCommerce.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("_OrderID")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ID");
 
-                    b.HasIndex("OrderID");
-
                     b.HasIndex("ProductID");
+
+                    b.HasIndex("_OrderID");
 
                     b.ToTable("OrderItem");
                 });
@@ -265,8 +272,8 @@ namespace PSPCommerce.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Price")
-                        .HasColumnType("INTEGER");
+                    b.Property<double>("Price")
+                        .HasColumnType("REAL");
 
                     b.HasKey("ID");
 
@@ -439,15 +446,15 @@ namespace PSPCommerce.Data.Migrations
 
             modelBuilder.Entity("PSPCommerce.Models.OrderItem", b =>
                 {
-                    b.HasOne("PSPCommerce.Models.Order", "_Order")
-                        .WithMany("_OrderItems")
-                        .HasForeignKey("OrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PSPCommerce.Models.Product", "_Product")
                         .WithMany()
                         .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PSPCommerce.Models.Order", "_Order")
+                        .WithMany("_OrderItems")
+                        .HasForeignKey("_OrderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

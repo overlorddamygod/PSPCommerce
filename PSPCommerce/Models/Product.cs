@@ -11,7 +11,7 @@ namespace PSPCommerce.Models
         public string ImageUrl { get; set; }
 
         [Required]
-        public double Price { get; set; }
+        public int Price { get; set; }
         [Required]
         public string Description { get; set; }
     }
