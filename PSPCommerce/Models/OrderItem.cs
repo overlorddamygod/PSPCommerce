@@ -9,8 +9,8 @@ namespace PSPCommerce.Models
         public int ProductID { get; set; }
         public int OrderID { get; set; }
 
-        public Order _Order { get; set; }
-        public Product _Product { get; set; }
+        public Order _Order { get; set; } = null!; 
+        public Product _Product { get; set; } = null!; 
     }
 }
 

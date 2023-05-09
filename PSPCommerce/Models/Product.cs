@@ -12,6 +12,9 @@ namespace PSPCommerce.Models
 
         [Required]
         public int Price { get; set; }
+        public int CategoryID { get; set; }
+        public Category _Category { get; set; } = null!; 
+
         [Required]
         public string Description { get; set; }
     }

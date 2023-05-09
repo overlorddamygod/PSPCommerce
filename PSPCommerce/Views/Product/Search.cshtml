@@ -29,12 +29,27 @@
 
 <h1>Search</h1>
 <div style="margin: 2rem 0;">
-    <form class="d-flex" asp-controller="Product" asp-action="Search" method="get">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q" value="@ViewBag.Q">
-        <input type="hidden" name="page" value="@(ViewBag.Page)" />
-        <input type="hidden" name="pageSize" value="@(ViewBag.PageSize)" />
-
-        <button class="btn btn-outline-success" type="submit">Search</button>
+    <form asp-controller="Product" asp-action="Search" method="get">
+        <div class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q" value="@ViewBag.Q">
+            <input type="hidden" name="page" value="@(ViewBag.Page)" />
+            <input type="hidden" name="pageSize" value="@(ViewBag.PageSize)" />
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </div>
+        <div class="d-flex">
+            <div>
+                <label>Category</label>  
+                @Html.DropDownList("category", ViewBag.CategoryID, "All", new { @class = "form-control" })
+                </div>
+            <div>
+                <label>Price Min</label>  
+                <input type="number" name="minPrice" value="@ViewBag.MinPrice" class="form-control" style="width: 100px;" />
+            </div>
+            <div>
+                <label>Price Max</label>  
+                <input type="number" name="maxPrice" value="@ViewBag.MaxPrice" class="form-control" style="width: 100px;" />
+            </div>
+        </div>
     </form>
 </div>
 <div class="row row-cols-1 row-cols-xs-2 row-cols-sm-2 row-cols-lg-4 g-3">
@@ -75,6 +90,9 @@
                     asp-route-q="@ViewBag.Q"
                     asp-route-page="@(ViewBag.Page - 1)"
                     asp-route-pageSize="@ViewBag.PageSize"
+                    asp-route-category="@ViewBag.Category"
+                    asp-route-minPrice="@ViewBag.MinPrice"
+                    asp-route-maxPrice="@ViewBag.MaxPrice"
                     class="btn btn-default"
                 >Previous</a>
             }
@@ -87,6 +105,9 @@
                     asp-route-q="@ViewBag.Q"
                     asp-route-page="@i"
                     asp-route-pageSize="@ViewBag.PageSize"
+                    asp-route-category="@ViewBag.Category"
+                    asp-route-minPrice="@ViewBag.MinPrice"
+                    asp-route-maxPrice="@ViewBag.MaxPrice"
                     class="btn @(i == ViewBag.Page ? "btn-primary" : "btn-default")"
                 >@i</a>
             }
@@ -99,6 +120,9 @@
                     asp-route-q="@ViewBag.Q"
                     asp-route-page="@(ViewBag.Page + 1)"
                     asp-route-pageSize="@ViewBag.PageSize"
+                    asp-route-category="@ViewBag.Category"
+                    asp-route-minPrice="@ViewBag.MinPrice"
+                    asp-route-maxPrice="@ViewBag.MaxPrice"
                     class="btn btn-default"
                 >Next</a>
             }

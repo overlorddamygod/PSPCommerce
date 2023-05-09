@@ -2,20 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PSPCommerce.Data;
 
 #nullable disable
 
-namespace PSPCommerce.Data.Migrations
+namespace PSPCommerce.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230508151918_product-price-int")]
-    partial class productpriceint
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -174,7 +171,22 @@ namespace PSPCommerce.Data.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("CartItem");
+                    b.ToTable("CartItem", (string)null);
+                });
+
+            modelBuilder.Entity("PSPCommerce.Models.Category", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.Favorites", b =>
@@ -196,7 +208,7 @@ namespace PSPCommerce.Data.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Favorite");
+                    b.ToTable("Favorite", (string)null);
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.Order", b =>
@@ -223,7 +235,7 @@ namespace PSPCommerce.Data.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Order");
+                    b.ToTable("Order", (string)null);
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.OrderItem", b =>
@@ -232,9 +244,8 @@ namespace PSPCommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("OrderID")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("OrderID")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ProductID")
                         .HasColumnType("INTEGER");
@@ -242,22 +253,22 @@ namespace PSPCommerce.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("_OrderID")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("ID");
+
+                    b.HasIndex("OrderID");
 
                     b.HasIndex("ProductID");
 
-                    b.HasIndex("_OrderID");
-
-                    b.ToTable("OrderItem");
+                    b.ToTable("OrderItem", (string)null);
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.Product", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryID")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
@@ -277,7 +288,9 @@ namespace PSPCommerce.Data.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Product");
+                    b.HasIndex("CategoryID");
+
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.User", b =>
@@ -446,21 +459,32 @@ namespace PSPCommerce.Data.Migrations
 
             modelBuilder.Entity("PSPCommerce.Models.OrderItem", b =>
                 {
+                    b.HasOne("PSPCommerce.Models.Order", "_Order")
+                        .WithMany("_OrderItems")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PSPCommerce.Models.Product", "_Product")
                         .WithMany()
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PSPCommerce.Models.Order", "_Order")
-                        .WithMany("_OrderItems")
-                        .HasForeignKey("_OrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("_Order");
 
                     b.Navigation("_Product");
+                });
+
+            modelBuilder.Entity("PSPCommerce.Models.Product", b =>
+                {
+                    b.HasOne("PSPCommerce.Models.Category", "_Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("_Category");
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.Order", b =>

@@ -13,7 +13,9 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Product> Product { get; set; } = default!;
     public DbSet<CartItem> CartItem { get; set; } = default!;
     public DbSet<Favorites> Favorite { get; set; } = default!;
+    public DbSet<Category> Category { get; set; } = default!;
     public DbSet<User> User { get; set; } = default!;
-    public DbSet<PSPCommerce.Models.Order> Order { get; set; } = default!;
+    public DbSet<Order> Order { get; set; } = default!;
+    public DbSet<OrderItem> OrderItem { get; set; } = default!;
 }
 

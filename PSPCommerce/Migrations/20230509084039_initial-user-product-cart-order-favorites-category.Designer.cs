@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PSPCommerce.Data;
 
 #nullable disable
 
-namespace PSPCommerce.Data.Migrations
+namespace PSPCommerce.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230509084039_initial-user-product-cart-order-favorites-category")]
+    partial class initialuserproductcartorderfavoritescategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -174,6 +177,21 @@ namespace PSPCommerce.Data.Migrations
                     b.ToTable("CartItem");
                 });
 
+            modelBuilder.Entity("PSPCommerce.Models.Category", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Category");
+                });
+
             modelBuilder.Entity("PSPCommerce.Models.Favorites", b =>
                 {
                     b.Property<int>("ID")
@@ -253,6 +271,9 @@ namespace PSPCommerce.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -269,6 +290,8 @@ namespace PSPCommerce.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CategoryID");
 
                     b.ToTable("Product");
                 });
@@ -454,6 +477,17 @@ namespace PSPCommerce.Data.Migrations
                     b.Navigation("_Order");
 
                     b.Navigation("_Product");
+                });
+
+            modelBuilder.Entity("PSPCommerce.Models.Product", b =>
+                {
+                    b.HasOne("PSPCommerce.Models.Category", "_Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("_Category");
                 });
 
             modelBuilder.Entity("PSPCommerce.Models.Order", b =>

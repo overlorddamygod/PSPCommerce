@@ -19,15 +19,14 @@ namespace PSPCommerce.Controllers
             _context = context;
         }
 
-        // GET: Product
+        // GET: product
         public async Task<IActionResult> Index()
         {
-            return _context.Product != null ?
-                        View(await _context.Product.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.Product'  is null.");
+            var applicationDbContext = _context.Product.Include(p => p._Category);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Product/Details/5
+        // GET: product/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Product == null)
@@ -36,6 +35,7 @@ namespace PSPCommerce.Controllers
             }
 
             var product = await _context.Product
+                .Include(p => p._Category)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (product == null)
             {
@@ -45,17 +45,35 @@ namespace PSPCommerce.Controllers
             return View(product);
         }
 
-        // GET: Product/Create
+        // GET: product/Create
         public IActionResult Create()
         {
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "Name");
             return View();
+        }
+
+        // POST: product/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Name,ImageUrl,Price,CategoryID,Description,ID")] Product product)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(product);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "Name", product.CategoryID);
+            return View(product);
         }
 
         [HttpGet]
         [Route("product/search")]
         public async Task<IActionResult> Search([FromQuery] ProductSearchParamsDto query)
-        {   
-            if (!ModelState.IsValid) 
+        {
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -64,35 +82,29 @@ namespace PSPCommerce.Controllers
             ViewBag.PageSize = query.PageSize;
             var q = (query.Q ?? String.Empty).ToLower();
             ViewBag.Q = q;
+            ViewBag.Category = query.Category;
 
-            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q));
-                
+            ViewBag.MinPrice = query.minPrice;
+            ViewBag.MaxPrice = query.maxPrice;
+
+            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q)).Where(p => p.Price >= query.minPrice && p.Price <= query.maxPrice);
+
+            if (query.Category != null)
+            {
+                products = products.Where(p => p.CategoryID == query.Category).Include(p => p._Category);
+            }
+
             var paginatedProducts = await products.Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
                 .ToListAsync();
-            
+
             ViewBag.TotalPages = Math.Ceiling((double)products.Count() / query.PageSize);
 
+            ViewBag.CategoryID = new SelectList(_context.Category, "ID", "Name");
             return View(paginatedProducts);
         }
 
-        // POST: Product/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,ImageUrl,Price,Description,ID")] Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(product);
-        }
-
-        // GET: Product/Edit/5
+        // GET: product/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Product == null)
@@ -105,15 +117,16 @@ namespace PSPCommerce.Controllers
             {
                 return NotFound();
             }
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "ID", product.CategoryID);
             return View(product);
         }
 
-        // POST: Product/Edit/5
+        // POST: product/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,ImageUrl,Price,Description,ID")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,ImageUrl,Price,CategoryID,Description,ID")] Product product)
         {
             if (id != product.ID)
             {
@@ -140,10 +153,11 @@ namespace PSPCommerce.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "ID", product.CategoryID);
             return View(product);
         }
 
-        // GET: Product/Delete/5
+        // GET: product/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Product == null)
@@ -152,6 +166,7 @@ namespace PSPCommerce.Controllers
             }
 
             var product = await _context.Product
+                .Include(p => p._Category)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (product == null)
             {
@@ -161,7 +176,7 @@ namespace PSPCommerce.Controllers
             return View(product);
         }
 
-        // POST: Product/Delete/5
+        // POST: product/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
