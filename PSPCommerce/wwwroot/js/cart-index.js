@@ -15,7 +15,7 @@ const setQuantity = async (id, quantity) => {
       body: JSON.stringify(data),
     });
     if (!result.ok) {
-        throw result
+      throw result;
     }
   } catch (err) {
     alert("FAILED");
@@ -36,10 +36,17 @@ cartRow.forEach((cart) => {
       if (!isValid(quantity)) {
         return;
       }
-      
-      document.getElementById("total-price").innerText = cartRow.reduce((acc, row) => {
-        return acc + (+row.querySelector("#cart-quantity").value * +row.getAttribute("data-price"))
-      }, 0)
+
+      document.getElementById("total-price").innerText = cartRow.reduce(
+        (acc, row) => {
+          return (
+            acc +
+            +row.querySelector("#cart-quantity").value *
+              +row.getAttribute("data-price")
+          );
+        },
+        0
+      );
 
       setQuantity(cart.getAttribute("data-id"), quantity);
     })

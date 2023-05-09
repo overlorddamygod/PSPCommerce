@@ -51,6 +51,31 @@ namespace PSPCommerce.Controllers
             return View();
         }
 
+        [HttpGet]
+        [Route("product/search")]
+        public async Task<IActionResult> Search([FromQuery] ProductSearchParamsDto query)
+        {   
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(ModelState);
+            }
+
+            ViewBag.Page = query.Page;
+            ViewBag.PageSize = query.PageSize;
+            var q = (query.Q ?? String.Empty).ToLower();
+            ViewBag.Q = q;
+
+            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q));
+                
+            var paginatedProducts = await products.Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+            
+            ViewBag.TotalPages = Math.Ceiling((double)products.Count() / query.PageSize);
+
+            return View(paginatedProducts);
+        }
+
         // POST: Product/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
