@@ -22,9 +22,9 @@ namespace PSPCommerce.Controllers
         // GET: Category
         public async Task<IActionResult> Index()
         {
-              return _context.Category != null ? 
-                          View(await _context.Category.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Category'  is null.");
+            return _context.Category != null ?
+                        View(await _context.Category.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.Category'  is null.");
         }
 
         // GET: Category/Details/5
@@ -150,14 +150,14 @@ namespace PSPCommerce.Controllers
             {
                 _context.Category.Remove(category);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CategoryExists(int id)
         {
-          return (_context.Category?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Category?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

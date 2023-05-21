@@ -57,10 +57,35 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,ImageUrl,Price,CategoryID,Description,ID")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,Price,CategoryID,Description,ID")] Product product, IFormFile imageFile)
         {
+            // log model state errors
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
+            
             if (ModelState.IsValid)
             {
+
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var fileName = Path.GetRandomFileName().Replace(".", string.Empty);
+                    var fileExtension = Path.GetExtension(imageFile.FileName);
+                    var uniqueFileName = fileName + fileExtension;
+
+                    // Save the image to a specific location
+                    var imagePath = Path.Combine("wwwroot/images", uniqueFileName);
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    product.ImageUrl = Path.Combine("images", uniqueFileName);
+                }
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

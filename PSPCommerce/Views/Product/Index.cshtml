@@ -34,7 +34,7 @@
             <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ID">
             <div class="card h-100 shadow-sm">
                 <div>   
-                    <img src="@item.ImageUrl" alt="@item.Description" class="product-image"/>
+                    <img src="/@item.ImageUrl" alt="@item.Description" class="product-image"/>
                 </div>
                 <div class="p-2">
                     <h5 class="text-truncate">@Html.DisplayFor(modelItem => item.Name)</h5>

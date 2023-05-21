@@ -10,7 +10,7 @@ namespace PSPCommerce.Models
         public string PaymentIntentID { get; set; }
         public Boolean IsPaid { get; set; }
         public User _User { get; set; } = null!; 
-        public IEnumerable<OrderItem> _OrderItems { get; set; }
+        public IEnumerable<OrderItem>? _OrderItems { get; set; } = null;
     }
 }
 
