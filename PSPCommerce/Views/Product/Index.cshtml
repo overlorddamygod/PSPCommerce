@@ -4,52 +4,6 @@
     ViewData["Title"] = "Index";
 }
 
-<style>
-    .card {
-        background: #fff;
-        box-shadow: 0 6px 10px rgba(0, 0, 0, .08), 0 0 6px rgba(0, 0, 0, .05);
-        border: 0;
-        border-radius: 1rem;
-        transition: transform 0.3s ease-out; /* Add smooth transition */
-
-    }
-    
-    .card:hover {
-        scale: 1.05;
-        transition: all;
-    }
-
-    .product-image {
-        width: 100%;
-        min-height: 250px;
-        max-height: 250px;
-        object-fit: cover;
-    }
-</style>
-
-<h1>Index</h1>
-<div class="row row-cols-1 row-cols-xs-2 row-cols-sm-2 row-cols-lg-4 g-3">
-    @foreach (var item in Model) {
-        <div class="col hp">
-            <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ID">
-            <div class="card h-100 shadow-sm">
-                <div>   
-                    <img src="/@item.ImageUrl" alt="@item.Description" class="product-image"/>
-                </div>
-                <div class="p-2">
-                    <h5 class="text-truncate">@Html.DisplayFor(modelItem => item.Name)</h5>
-                    <div class="text-secondary text-truncate">@Html.DisplayFor(modelItem => item.Description)</div>
-                    <strong>Rs. @Html.DisplayFor(modelItem => item.Price)</strong>
-                    <form asp-controller="Cart" asp-action="Add" method="post" class="w-100">
-                        <input type="hidden" value="@item.ID" name="productId" />
-                        <input type="submit" value="Add to Cart" class="btn btn-primary" />
-                    </form>
-                </div>
-            </div>
-            </a>
-        </div>
-    }
-</div>
 <p>
     <a asp-action="Create">Create New</a>
 </p>

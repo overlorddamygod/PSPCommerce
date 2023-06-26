@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +15,21 @@ namespace PSPCommerce.Controllers
     public class FavoriteController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public FavoriteController(ApplicationDbContext context)
+        public FavoriteController(ApplicationDbContext context,UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Favorite
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Favorite.Include(f => f._Product).Include(f => f._User);
+            var user = await _userManager.GetUserAsync(User);
+
+            var applicationDbContext = _context.Favorite.Where(cart => cart.UserID == user.Id).Include(f => f._Product).Include(f => f._User);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -70,6 +77,37 @@ namespace PSPCommerce.Controllers
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description", favorites.ProductID);
             ViewData["UserID"] = new SelectList(_context.User, "Id", "Id", favorites.UserID);
             return View(favorites);
+        }
+
+        [HttpPost("/favorite/add")]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Add(int productId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            var userId = user.Id;
+            var favorites = await _context.Favorite.FirstOrDefaultAsync(ci => ci.UserID == userId && ci.ProductID == productId);
+
+            if (favorites == null)
+            {
+                favorites = new Favorites
+                {
+                    ProductID = productId,
+                    UserID = userId,
+                };
+
+                await _context.Favorite.AddAsync(favorites);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
 
         // GET: Favorite/Edit/5
@@ -128,6 +166,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Favorite/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Favorite == null)

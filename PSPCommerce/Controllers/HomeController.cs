@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PSPCommerce.Data;
 using PSPCommerce.Models;
 
 namespace PSPCommerce.Controllers;
@@ -7,15 +9,19 @@ namespace PSPCommerce.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly ApplicationDbContext _context;
 
-    public HomeController(ILogger<HomeController> logger)
+
+    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
     {
         _logger = logger;
+        _context = context;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var applicationDbContext = _context.Product.Include(p => p._Category);
+        return View(await applicationDbContext.ToListAsync());
     }
 
     public IActionResult Privacy()

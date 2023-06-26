@@ -1,41 +1,63 @@
 @model IEnumerable<PSPCommerce.Models.Favorites>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Favorites";
 }
 
-<h1>Index</h1>
+<style>
+    .card {
+        background: #fff;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, .08), 0 0 6px rgba(0, 0, 0, .05);
+        border: 0;
+        border-radius: 1rem;
+        transition: transform 0.3s ease-out; /* Add smooth transition */
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model._User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model._Product)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item._User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item._Product.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    }
+    
+    .card:hover {
+        scale: 1.05;
+        transition: all;
+    }
+
+    .product-image {
+        width: 100%;
+        min-height: 250px;
+        max-height: 250px;
+        object-fit: cover;
+    }
+
+    a {
+        text-decoration: none;
+        color: #212529;
+    }
+</style>
+
+<h1>Favorites</h1>
+
+<div class="row row-cols-1 row-cols-xs-2 row-cols-sm-2 row-cols-lg-4 g-3">
+    @foreach (var item in Model)
+    {
+        <div class="col hp">
+            <a asp-controller="Product" asp-action="Details" asp-route-id="@item._Product.ID">
+                <div class="card h-100 shadow-sm">
+                    <div>   
+                        <img src="/@item._Product.ImageUrl" alt="@item._Product.Description" class="product-image"/>
+                    </div>
+                    <div class="p-2">
+                        <h5 class="text-truncate">@Html.DisplayFor(modelItem => item._Product.Name)</h5>
+                        <div class="text-secondary text-truncate">@Html.DisplayFor(modelItem => item._Product.Description)</div>
+                        <strong>Rs. @Html.DisplayFor(modelItem => item._Product.Price)</strong>
+                        <form asp-action="Delete">
+                            <input type="hidden" name="id" value="@item.ID" />
+                            <input type="submit" value="Remove from Favorites" class="btn btn-danger" />
+                        </form>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+    @if (Model.Count() == 0)
+    {
+        <div class="text-secondary">You have no favorites yet.</div>
+    }
+</div>
