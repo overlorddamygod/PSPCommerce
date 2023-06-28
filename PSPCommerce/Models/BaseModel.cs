@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PSPCommerce.Models
@@ -7,8 +8,8 @@ namespace PSPCommerce.Models
     {
         public int ID { get; set; }
 
-        // [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        // public DateTime CreatedAt { get; set; }
+        [Required, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime CreatedAt { get; set; }
 
         // [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         // public DateTime UpdatedAt { get; set; }

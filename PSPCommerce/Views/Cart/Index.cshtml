@@ -12,56 +12,103 @@
 @* <p>
     <a asp-action="Create">Create New</a>
 </p> *@
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Product
-            </th>
-            <th>
-                Price
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr class="cart-row" data-id="@item.ID" data-price="@item._Product.Price"> 
-            <td>
-                @Html.DisplayFor(modelItem => item._Product.Name)
-                <p class="text-secondary" style="width:25vw">
-                  @Html.DisplayFor(modelItem => item._Product.Description)  
-                </p>
-                <img src="/@item._Product.ImageUrl" alt="@item._Product.Description" height="100" width="100"/>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item._Product.Price)
-            </td>
-            <td>
-                <div>
-                    <div class="cart-buttons" data-id="@item.ID">
-                        <button id="decrement" class="btn btn-primary">
-                            -
-                        </button>
-                        <input type="number" style="width:5vw" id="cart-quantity" value="@item.Quantity" min="1" max="100">
-                        <button id="increment"  class="btn btn-primary">
-                            +
-                        </button>
+<main>
+    <div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Product
+                </th>
+                <th>
+                    Price
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+            <tr class="cart-row" data-id="@item.ID" data-price="@item._Product.Price"> 
+                <td>
+                    <img src="/@item._Product.ImageUrl" alt="@item._Product.Description" height="100"/>
+                    @Html.DisplayFor(modelItem => item._Product.Name)
+                    
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item._Product.Price)
+                </td>
+                <td>
+                    <div>
+                        <div class="cart-buttons" data-id="@item.ID">
+                            <button id="decrement" class="btn btn-primary">
+                                -
+                            </button>
+                            <input type="number" style="width:5vw" id="cart-quantity" value="@item.Quantity" min="1" max="100">
+                            <button id="increment"  class="btn btn-primary">
+                                +
+                            </button>
+                        </div>
                     </div>
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                </td>
+            </tr>
+    }
+
+
+        </tbody>
+
+    </table>
+    </div>
+    <div id="checkout">
+        <div id="payment-box">
+            <h2>Checkout</h2>
+            
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="cardholder-name">Cardholder Name</label>
+                    <input id="cardholder-name" class="form-control" type="text" />
                 </div>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
+                <div class="form-group">
+                    <label for="card-element">Credit or debit card</label>
+                    <div id="card-element" class="form-control"></div>
+                </div>
+                <div class="form-group">
+                    <button id="submit-button" class="btn btn-primary">Pay Rs.@totalPrice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
 
+<div id="loading">
+    <div>
+        <div class="spinner-border text-warning" role="status">
+            <span span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
 
-    </tbody>
+<style>
+    #loading {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        background-color: black;
+        opacity: 0.6;
+    }
+    #loading > div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+</style>
 
-</table>
-
-<div>
+@* <div>
     <div>Total Price: Rs.<span id="total-price">@totalPrice</span></div>
 
     <div id="payment-box">
@@ -77,11 +124,25 @@
                 <div id="card-element" class="form-control"></div>
             </div>
             <div class="form-group">
-                <button id="submit-button" class="btn btn-primary">Pay</button>
+                <button id="submit-button" class="btn btn-primary">Pay Rs.@totalPrice</button>
             </div>
         </form>
     </div>
-</div>
+</div> *@
+
+<style>
+    .main {
+        display: flex;
+    }
+    #checkout {
+        padding: 1rem;
+        background-color: #eff0f4; 
+    }
+    #checkout button {
+        margin: 1rem 0 0 0;
+    }
+   
+</style>
 
 
 
@@ -91,6 +152,11 @@
     
     <script src="https://js.stripe.com/v3/"></script>
     <script>
+        const loadingDiv = document.getElementById('loading');
+
+        const setLoading = (isLoading) => {
+            loadingDiv.style.display = isLoading ? "flex" : "none";
+        }
 
         const stripe = Stripe("pk_test_51L6teVLq5jVwlbtcevCzKQeNuzEE8dMzMubWk0vJegT64E9aDdPTohBlN4cyLLkHciEdMrykFcJPHz8m2HuFoVN900oBQxqx9v");
         const elements = stripe.elements();
@@ -110,54 +176,54 @@
         // Send card details to Stripe to create payment intent
         const payWithCard = async (stripe, cardElement) => {
             try {
+                setLoading(true);
                 const res = await fetch("/order/create-payment-intent", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        amount: +100
-                    })
-                })
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                });
                 const data = await res.json();
                 const paymentIntentSecret = data["client_secret"];
 
-                stripe.confirmCardPayment(paymentIntentSecret, {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: {
-                            name: document.getElementById('cardholder-name').value
-                        }
-                    }
-                }).then(async function(result) {
-                    if (result.error) {
-                        // Show error to customer
-                        alert(result.error.message);
-                    } else {
-                        fetch("/order/verify-payment", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                paymentId: result.paymentIntent.id
-                            })
-                        }).then(res => {
-                            console.log(res)
-                            alert("SUCCESS")
-                            window.location.href = "/order"
-                        }).catch(err=> {
-                            alert("ERROR:PAYMENT2")
-                        })
-                       
-                    }
-                }).catch(err=> {
-                    console.log("ERR",err)
-                    alert("ERROR:PAYMENT")
-                })
+                const result = await stripe.confirmCardPayment(paymentIntentSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                    name: document.getElementById("cardholder-name").value,
+                    },
+                },
+                });
+
+                if (result.error) {
+                // Show error to customer
+                alert(result.error.message);
+                } else {
+                const verifyRes = await fetch("/order/verify-payment", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                    paymentId: result.paymentIntent.id,
+                    }),
+                });
+
+                const verifyData = await verifyRes.json();
+
+                if (verifyData["redirect_url"]) {
+                    window.location.href = verifyData["redirect_url"];
+                } else {
+                    alert(verifyData.message);
+                }
+                }
             } catch (err) {
-                alert("ERROR:PAYMENT_INTENT")
+                console.log(err);
+                alert("An error occurred during payment.");
+            } finally {
+                setLoading(false);
             }
-        }
+        };
+                
     </script>
 }

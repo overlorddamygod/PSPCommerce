@@ -17,5 +17,29 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<User> User { get; set; } = default!;
     public DbSet<Order> Order { get; set; } = default!;
     public DbSet<OrderItem> OrderItem { get; set; } = default!;
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateCreatedDates();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        UpdateCreatedDates();
+        return base.SaveChanges();
+    }
+
+
+    private void UpdateCreatedDates()
+    {
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.State == EntityState.Added && entry.Entity is BaseModel)
+            {
+                ((BaseModel)entry.Entity).CreatedAt = DateTime.Now;
+            }
+        }
+    }
 }
 

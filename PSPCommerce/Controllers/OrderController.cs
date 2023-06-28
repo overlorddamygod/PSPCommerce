@@ -34,13 +34,17 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Order
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Order.Include(o => o._User);
+            var user = await _userManager.GetUserAsync(User);
+
+            var applicationDbContext = _context.Order.Where(order => order.UserID == user.Id).Include(o => o._OrderItems).ThenInclude(o => o._Product);
             return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Order/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Order == null)
@@ -50,6 +54,8 @@ namespace PSPCommerce.Controllers
 
             var order = await _context.Order
                 .Include(o => o._User)
+                .Include(o => o._OrderItems)
+                .ThenInclude(o => o._Product)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (order == null)
             {
@@ -62,15 +68,20 @@ namespace PSPCommerce.Controllers
         [HttpPost("/order/create-payment-intent")]
         [Authorize]
         public async Task<ActionResult> CreatePaymentIntent([FromBody] CreateIntentReq req)
-        {   
-            Console.WriteLine("Amount: " + req.amount);
+        {
             StripeConfiguration.ApiKey = _config["Stripe:SecretKey"];
 
             // get user id from user manager
             var user = await _userManager.GetUserAsync(User);
 
             // get the total price from the cart
-            var cart = _context.CartItem.Where(c => c.UserID == user!.Id).Include(c=>c._Product);            
+            var cart = _context.CartItem.Where(c => c.UserID == user!.Id).Include(c => c._Product);
+
+            // if cart has no items
+            if (cart == null)
+            {
+                return NotFound();
+            }
 
             // total price of cart items
             int totalPrice = 0;
@@ -81,7 +92,6 @@ namespace PSPCommerce.Controllers
             }
 
             // _context.Remove(cart);
-
 
             var options = new PaymentIntentCreateOptions
             {
@@ -118,7 +128,7 @@ namespace PSPCommerce.Controllers
             }
 
             await _context.SaveChangesAsync();
-            
+
 
             return Json(new { client_secret = intent.ClientSecret });
         }
@@ -126,33 +136,54 @@ namespace PSPCommerce.Controllers
         [HttpPost("/order/verify-payment")]
         [Authorize]
         public async Task<ActionResult> VerifyPayment([FromBody] VerifyPayReq req)
-        {   
+        {
             StripeConfiguration.ApiKey = _config["Stripe:SecretKey"];
 
             var service = new PaymentIntentService();
             var paymentIntent = await service.GetAsync(req.paymentId);
             Console.WriteLine("PAYMENT:    ", paymentIntent);
+            var order = _context.Order.SingleOrDefault(o => o.PaymentIntentID == req.paymentId);
             if (paymentIntent.Status == "succeeded")
             {
                 // payment was successful, update order and order items
-                var order = _context.Order.SingleOrDefault(o => o.PaymentIntentID == req.paymentId);
                 Console.WriteLine("Update ORDER:    ", order);
 
                 if (order != null)
                 {
                     order.IsPaid = true;
                     _context.Update(order);
-                Console.WriteLine("Update PAYMENT:    ", paymentIntent);
+                    Console.WriteLine("Update PAYMENT:    ", paymentIntent);
 
                     await _context.SaveChangesAsync();
+                    return Json(new
+                    {
+                        status = "success",
+                        message = "Payment was successful.",
+                        redirect_url = "/order/details/" + order.ID + "?success=true&message=Order Received"
+                    });
                 }
-
-                return Json(new { status = "success", message = "Payment was successful." });
+                else
+                {
+                    return Json(new { status = "error", message = "Order not found.", });
+                }
             }
             else
             {
                 // payment failed or is still processing, handle accordingly
-                return Json(new { status = "error", message = "Payment failed or is still processing." });
+                if (order != null)
+                {
+                    return Json(new
+                    {
+                        status = "error",
+                        message = "Payment failed or is still processing.",
+                        redirect_url = "/order/details/" + order.ID + "?success=false&message=Payment failed or is still processing."
+                    });
+                }
+                return Json(new
+                {
+                    status = "error",
+                    message = "Payment failed or is still processing.",
+                });
             }
         }
 
@@ -267,14 +298,14 @@ namespace PSPCommerce.Controllers
             {
                 _context.Order.Remove(order);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool OrderExists(int id)
         {
-          return (_context.Order?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Order?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

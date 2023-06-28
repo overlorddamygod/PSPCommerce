@@ -1,42 +1,73 @@
 @model PSPCommerce.Models.Order
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Order #" + Model.ID;
+
+    string? success = Context.Request.Query["success"];
+    string? message = Context.Request.Query["message"];
 }
 
-<h1>Details</h1>
+<link rel="stylesheet" href="~/css/order.css" />
+<style>
+    .message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        margin: 0 0 2rem 0;
+    }
+</style>
 
-<div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TotalPrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PaymentIntentID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PaymentIntentID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsPaid)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsPaid)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model._User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model._User.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+@if (success != null) {
+     @if (success == "true")
+    {
+        <div class="message bg-success text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px"><path fill="#c8e6c9" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z"/><path fill="#4caf50" d="M34.586,14.586l-13.57,13.586l-5.602-5.586l-2.828,2.828l8.434,8.414l16.395-16.414L34.586,14.586z"/></svg>
+            <h1 class=>@message</h1>
+        </div>
+    } else if (success == "false") {
+        <div class="message bg-danger text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px"><defs><linearGradient id="U0YIbGZHUdQctyzaK50hYa" x1="24" x2="24" y1="6.821" y2="41.179" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f85e55"/><stop offset="1" stop-color="#d41414"/></linearGradient></defs><path fill="url(#U0YIbGZHUdQctyzaK50hYa)" d="M36.144,41.179a1.492,1.492,0,0,1-1.061-.44L24,29.656,12.917,40.739a1.5,1.5,0,0,1-2.121,0L7.261,37.2a1.5,1.5,0,0,1,0-2.121L18.344,24,7.261,12.917a1.5,1.5,0,0,1,0-2.121L10.8,7.261a1.5,1.5,0,0,1,2.121,0L24,18.344,35.083,7.261a1.5,1.5,0,0,1,2.121,0L40.739,10.8a1.5,1.5,0,0,1,0,2.121L29.656,24,40.739,35.083a1.5,1.5,0,0,1,0,2.121L37.2,40.739A1.491,1.491,0,0,1,36.144,41.179Z" data-name="check cross mark"/></svg>
+            <h1>@message</h1>
+        </div>
+    }
+}
+
+<div class="order">
+    <div class="top">
+        <div>
+            Order #@Model.ID
+            <div class="text-secondary">Placed on @Model.CreatedAt.ToString("d' 'MMMM' 'yyyy")</div>
+        </div>
+        <div>
+            @if (@Model.IsPaid)
+            {
+                <span class="text-success">Paid</span>
+            } else {
+                <span class="text-danger">Payment Pending</span>
+            }
+        </div>
+    </div>
+    <div class="main">
+        @foreach (var item in Model._OrderItems)
+        {
+            <a asp-controller="Product" asp-action="Details" asp-route-id="@item._Product.ID">
+                <div class="order-item">
+                    <div>
+                        <img src="/@item._Product.ImageUrl" alt="@item._Product.Name" />
+                    </div>
+                    <div class="product">
+                        @item._Product.Name
+                    </div>
+                    <div class="quantity">Qty: @item.Quantity</div>
+                    <div>
+                        Price:
+                        <div>Rs.@(item._Product.Price * item.Quantity)</div>
+                    </div>
+                </div>
+            </a>
+        }
+        Total Price: Rs.@Model.TotalPrice
+    </div>
 </div>

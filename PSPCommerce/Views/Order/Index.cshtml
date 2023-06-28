@@ -1,53 +1,51 @@
 @model IEnumerable<PSPCommerce.Models.Order>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Order History";
 }
 
-<h1>Index</h1>
+<h1>Order History</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentIntentID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsPaid)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model._User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentIntentID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsPaid)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item._User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
+
+<link rel="stylesheet" href="~/css/order.css" />
+
+@foreach (var order in Model) {
+    <a asp-controller="Order" asp-action="Details" asp-route-id="@order.ID">
+    <div class="order">
+        <div class="top">
+            <div>
+                Order #@order.ID
+                <div class="text-secondary">Placed on @order.CreatedAt.ToString("d' 'MMMM' 'yyyy")</div>
+            </div>
+            <div>
+                @if (@order.IsPaid)
+                {
+                    <span class="text-success">Paid</span>
+                } else {
+                    <span class="text-danger">Payment Pending</span>
+                }
+            </div>
+        </div>
+        <div class="main">
+            @foreach (var item in order._OrderItems)
+            {
+                <a asp-controller="Product" asp-action="Details" asp-route-id="@item._Product.ID">
+                    <div class="order-item">
+                        <div>
+                            <img src="/@item._Product.ImageUrl" alt="@item._Product.Name" />
+                        </div>
+                        <div class="product">
+                            @item._Product.Name
+                        </div>
+                        <div class="quantity">Qty: @item.Quantity</div>
+                        <div>
+                            Price:
+                            <div>Rs.@(item._Product.Price * item.Quantity)</div>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+    </a>
 }
-    </tbody>
-</table>

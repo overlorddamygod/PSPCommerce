@@ -37,7 +37,7 @@ cartRow.forEach((cart) => {
         return;
       }
 
-      document.getElementById("total-price").innerText = cartRow.reduce(
+      document.getElementById("submit-button").innerText = "Pay Rs."+cartRow.reduce(
         (acc, row) => {
           return (
             acc +

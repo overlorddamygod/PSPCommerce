@@ -29,7 +29,7 @@ namespace PSPCommerce.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var applicationDbContext = _context.Favorite.Where(cart => cart.UserID == user.Id).Include(f => f._Product).Include(f => f._User);
+            var applicationDbContext = _context.Favorite.Where(fav => fav.UserID == user.Id).Include(f => f._Product).Include(f => f._User);
             return View(await applicationDbContext.ToListAsync());
         }
 
