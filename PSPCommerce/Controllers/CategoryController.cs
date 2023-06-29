@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using PSPCommerce.Models;
 
 namespace PSPCommerce.Controllers
 {
+    [Authorize(Roles="Admin")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +22,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Category
+        
         public async Task<IActionResult> Index()
         {
             return _context.Category != null ?

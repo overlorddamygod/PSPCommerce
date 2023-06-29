@@ -39,7 +39,7 @@ namespace PSPCommerce.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var applicationDbContext = _context.Order.Where(order => order.UserID == user.Id).Include(o => o._OrderItems).ThenInclude(o => o._Product);
+            var applicationDbContext = _context.Order.Where(order => order.UserID == user.Id).Include(o => o._OrderItems).ThenInclude(o => o._Product).OrderByDescending(order => order.CreatedAt);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -189,6 +189,7 @@ namespace PSPCommerce.Controllers
 
 
         // GET: Order/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["UserID"] = new SelectList(_context.User, "Id", "Id");
@@ -200,6 +201,8 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Create([Bind("UserID,TotalPrice,PaymentIntentID,IsPaid,ID")] Order order)
         {
             if (ModelState.IsValid)
@@ -213,6 +216,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Order/Edit/5
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Order == null)
@@ -234,6 +239,8 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Edit(int id, [Bind("UserID,TotalPrice,PaymentIntentID,IsPaid,ID")] Order order)
         {
             if (id != order.ID)
@@ -266,6 +273,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Order/Delete/5
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Order == null)
@@ -287,6 +296,8 @@ namespace PSPCommerce.Controllers
         // POST: Order/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Order == null)

@@ -34,6 +34,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Favorite/Details/5
+                [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Favorite == null)
@@ -54,6 +56,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Favorite/Create
+                [Authorize(Roles="Admin")]
+
         public IActionResult Create()
         {
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description");
@@ -66,6 +70,8 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+                [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Create([Bind("ProductID,UserID,ID")] Favorites favorites)
         {
             if (ModelState.IsValid)
@@ -111,6 +117,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Favorite/Edit/5
+                [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Favorite == null)
@@ -133,6 +141,8 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+                [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Edit(int id, [Bind("ProductID,UserID,ID")] Favorites favorites)
         {
             if (id != favorites.ID)

@@ -53,6 +53,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Cart/Create
+        [Authorize(Roles="Admin")]
+
         public IActionResult Create()
         {
             ViewData["ProductID"] = new SelectList(_context.Product, "ID", "Description");
@@ -65,6 +67,8 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+                [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Create([Bind("ProductID,Quantity,UserID,ID")] CartItem cartItem)
         {
             if (ModelState.IsValid)
@@ -144,6 +148,8 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Cart/Edit/5
+        [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.CartItem == null)
@@ -166,6 +172,8 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+                [Authorize(Roles="Admin")]
+
         public async Task<IActionResult> Edit(int id, [Bind("ProductID,Quantity,UserID,ID")] CartItem cartItem)
         {
             if (id != cartItem.ID)
@@ -199,6 +207,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Cart/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.CartItem == null)
@@ -221,6 +230,8 @@ namespace PSPCommerce.Controllers
         // POST: Cart/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
+
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.CartItem == null)
