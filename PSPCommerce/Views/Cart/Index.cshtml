@@ -1,7 +1,7 @@
 @model IEnumerable<PSPCommerce.Models.CartItem>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Cart";
 
     var totalPrice = Model.Sum(cart => cart._Product.Price * cart.Quantity);
 }
