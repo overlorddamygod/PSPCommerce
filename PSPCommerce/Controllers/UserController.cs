@@ -2,98 +2,98 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PSPCommerce.Data;
 using PSPCommerce.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace PSPCommerce.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class CategoryController : Controller
+    public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CategoryController(ApplicationDbContext context)
+        public UserController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Category
-
+        // GET: User
         public async Task<IActionResult> Index()
         {
-            return _context.Category != null ?
-                        View(await _context.Category.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.Category'  is null.");
+            return _context.User != null ?
+                        View(await _context.User.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.User'  is null.");
         }
 
-        // GET: Category/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: User/Details/5
+        public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.Category == null)
+            if (id == null || _context.User == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (category == null)
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(user);
         }
 
-        // GET: Category/Create
+        // GET: User/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Category/Create
+        // POST: User/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,ID")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(user);
         }
 
-        // GET: Category/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: User/Edit/5
+        public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.Category == null)
+            if (id == null || _context.User == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Category.FindAsync(id);
-            if (category == null)
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return View(user);
         }
 
-        // POST: Category/Edit/5
+        // POST: User/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,ID")] Category category)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] User user)
         {
-            if (id != category.ID)
+            if (id != user.Id)
             {
                 return NotFound();
             }
@@ -102,12 +102,12 @@ namespace PSPCommerce.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.ID))
+                    if (!UserExists(user.Id))
                     {
                         return NotFound();
                     }
@@ -118,49 +118,49 @@ namespace PSPCommerce.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(user);
         }
 
-        // GET: Category/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: User/Delete/5
+        public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.Category == null)
+            if (id == null || _context.User == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (category == null)
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(user);
         }
 
-        // POST: Category/Delete/5
+        // POST: User/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Category == null)
+            if (_context.User == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Category'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.User'  is null.");
             }
-            var category = await _context.Category.FindAsync(id);
-            if (category != null)
+            var user = await _context.User.FindAsync(id);
+            if (user != null)
             {
-                _context.Category.Remove(category);
+                _context.User.Remove(user);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool UserExists(string id)
         {
-            return (_context.Category?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

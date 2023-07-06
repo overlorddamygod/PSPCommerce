@@ -39,7 +39,7 @@ namespace PSPCommerce.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var applicationDbContext = _context.Order.Where(order => order.UserID == user.Id).Include(o => o._OrderItems).ThenInclude(o => o._Product).OrderByDescending(order => order.CreatedAt);
+            var applicationDbContext = _context.Order.Where(order => order.UserID == user.Id).Include(o => o._OrderItems).ThenInclude(o => o._Product).ThenInclude(c => c.Images).OrderByDescending(order => order.CreatedAt);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -56,6 +56,7 @@ namespace PSPCommerce.Controllers
                 .Include(o => o._User)
                 .Include(o => o._OrderItems)
                 .ThenInclude(o => o._Product)
+                .ThenInclude(c => c.Images)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (order == null)
             {

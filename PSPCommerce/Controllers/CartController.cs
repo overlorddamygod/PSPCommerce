@@ -28,7 +28,7 @@ namespace PSPCommerce.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
-            var applicationDbContext = _context.CartItem.Where(cart => cart.UserID == user.Id).Include(c => c._Product).Include(c => c._User);
+            var applicationDbContext = _context.CartItem.Where(cart => cart.UserID == user.Id).Include(c => c._Product).ThenInclude(c => c.Images).Include(c => c._User);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -53,7 +53,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Cart/Create
-        [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public IActionResult Create()
         {
@@ -67,7 +67,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Create([Bind("ProductID,Quantity,UserID,ID")] CartItem cartItem)
         {
@@ -148,7 +148,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Cart/Edit/5
-        [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -172,7 +172,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Edit(int id, [Bind("ProductID,Quantity,UserID,ID")] CartItem cartItem)
         {

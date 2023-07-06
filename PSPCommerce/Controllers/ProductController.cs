@@ -24,7 +24,8 @@ namespace PSPCommerce.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Product.Include(p => p._Category);
+            var applicationDbContext = _context.Product.Include(p => p._Category).Include(c => c.Images)
+;
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -38,6 +39,7 @@ namespace PSPCommerce.Controllers
 
             var product = await _context.Product
                 .Include(p => p._Category)
+                .Include(c => c.Images)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (product == null)
             {
@@ -55,14 +57,41 @@ namespace PSPCommerce.Controllers
             return View();
         }
 
+        private async Task<List<ProductImage>> StoreAndGetImages(List<IFormFile> imageFiles)
+        {
+            List<ProductImage> images = new List<ProductImage>();
+            if (imageFiles != null && imageFiles.Count > 0)
+            {
+                foreach (var imageFile in imageFiles)
+                {
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        var fileName = Path.GetRandomFileName().Replace(".", string.Empty);
+                        var fileExtension = Path.GetExtension(imageFile.FileName);
+                        var uniqueFileName = fileName + fileExtension;
+
+                        // Save the image to a specific location
+                        var imagePath = Path.Combine("wwwroot/images", uniqueFileName);
+                        using (var stream = new FileStream(imagePath, FileMode.Create))
+                        {
+                            await imageFile.CopyToAsync(stream);
+                        }
+
+                        var imageUrl = Path.Combine("images", uniqueFileName);
+                        images.Add(new ProductImage { ImageUrl = imageUrl });
+                    }
+                }
+            }
+            return images;
+        }
+
         // POST: product/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-
-        public async Task<IActionResult> Create([Bind("Name,Price,CategoryID,Description,ID")] Product product, IFormFile imageFile)
+        public async Task<IActionResult> Create([Bind("Name,Price,CategoryID,Description,ID")] Product product, List<IFormFile> imageFiles)
         {
             // log model state errors
             foreach (var modelState in ModelState.Values)
@@ -75,29 +104,20 @@ namespace PSPCommerce.Controllers
 
             if (ModelState.IsValid)
             {
-
-                if (imageFile != null && imageFile.Length > 0)
+                StoreAndGetImages(imageFiles).ContinueWith((images) =>
                 {
-                    var fileName = Path.GetRandomFileName().Replace(".", string.Empty);
-                    var fileExtension = Path.GetExtension(imageFile.FileName);
-                    var uniqueFileName = fileName + fileExtension;
+                    product.Images = images.Result;
+                }).Wait();
 
-                    // Save the image to a specific location
-                    var imagePath = Path.Combine("wwwroot/images", uniqueFileName);
-                    using (var stream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    product.ImageUrl = Path.Combine("images", uniqueFileName);
-                }
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "Name", product.CategoryID);
             return View(product);
         }
+
 
         [HttpGet]
         [Route("product/search")]
@@ -124,7 +144,7 @@ namespace PSPCommerce.Controllers
                 products = products.Where(p => p.CategoryID == query.Category).Include(p => p._Category);
             }
 
-            var paginatedProducts = await products.Skip((query.Page - 1) * query.PageSize)
+            var paginatedProducts = await products.Include(c => c.Images).Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
                 .ToListAsync();
 
@@ -144,12 +164,12 @@ namespace PSPCommerce.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
+            var product = await _context.Product.Include(p => p.Images).FirstOrDefaultAsync(p => p.ID == id);
             if (product == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "ID", product.CategoryID);
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "Name", product.CategoryID);
             return View(product);
         }
 
@@ -160,8 +180,22 @@ namespace PSPCommerce.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
 
-        public async Task<IActionResult> Edit(int id, [Bind("Name,ImageUrl,Price,CategoryID,Description,ID")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,Price,CategoryID,Description,ID")] Product product, List<IFormFile> imageFiles)
         {
+            // loop imageFiles
+            foreach (IFormFile item in imageFiles)
+            {
+                Console.WriteLine("HERE", item, "SAD");
+
+            }
+            // log model state errors
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
             if (id != product.ID)
             {
                 return NotFound();
@@ -171,6 +205,11 @@ namespace PSPCommerce.Controllers
             {
                 try
                 {
+                    var images = await StoreAndGetImages(imageFiles);
+                    foreach (ProductImage img in images)
+                    {
+                        product.Images.Add(img);
+                    }
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -187,7 +226,7 @@ namespace PSPCommerce.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "ID", product.CategoryID);
+            ViewData["CategoryID"] = new SelectList(_context.Category, "ID", "Name", product.CategoryID);
             return View(product);
         }
 

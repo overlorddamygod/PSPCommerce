@@ -81,7 +81,7 @@ namespace PSPCommerce.Controllers
                 Console.WriteLine("User is already in role");
                 return RedirectToAction("Index", "Home");
             }
-            
+
             Console.WriteLine("Role exists, proceed to add the role to the user");
             var result = await _userManager.AddToRoleAsync(user, "Admin");
             // Role exists, proceed to add the role to the user
@@ -90,7 +90,7 @@ namespace PSPCommerce.Controllers
             {
                 throw new Exception("Failed to add user to role");
             }
-            
+
             return RedirectToAction("Index", "Home");
         }
     }

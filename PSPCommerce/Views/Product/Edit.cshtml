@@ -1,7 +1,7 @@
 @model PSPCommerce.Models.Product
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Product";
 }
 
 <h1>Edit</h1>
@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        @using (Html.BeginForm("Edit", "Product", FormMethod.Post, new { enctype = "multipart/form-data" })) {
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -18,9 +18,21 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                Add Product Images
+                <input type="file" name="imageFiles" class="form-control" required multiple/>
+                <span class="text-danger">@Html.ValidationMessage("imageFiles")</span>
+                <div class="images">
+                    @foreach (var image in Model.Images)
+                    {
+                        <div class="img-small-container">
+                            <img class="img-small" src="/@image.ImageUrl" alt="image">
+                            <a class="cross" asp-controller="ProductImage" asp-action="DeleteImage" asp-route-id="@image.ID">
+                                ❌
+                            </a>
+                        </div>
+                    }
+                </div>
+                @* <span asp-validation-for="ImageUrl" class="text-danger"></span> *@
             </div>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
@@ -41,13 +53,45 @@
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
-        </form>
+        }
     </div>
 </div>
 
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+<style>
+    .images {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin: 1rem 0;
+    }
+    .img-small-container {
+        position: relative;    
+        width: 6rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .img-small-container a {
+        text-decoration: none;
+    }
+    .img-small {
+        height: 6rem;
+    }
+
+    .cross {
+        position: absolute;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+    }
+    .cross:hover {
+        scale: 1.2;
+    }
+</style>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

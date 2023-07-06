@@ -4,38 +4,83 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div>
-    <div class="d-flex p-3 shadow rounded">
-        <img class="image me-2" src="/@Model.ImageUrl" alt="@Model.Name" />
-
-        <div id="cart-text">
-            <button class="free-shipping">Free shipping</button>
-            <h2>@Model.Name</h2>
-            <h4>@Model.Description</h4>
-            <h1>Rs. @Model.Price</h1>
-
-            <form asp-controller="Cart" asp-action="Add" method="post">
-                <input type="hidden" value="@Model.ID" name="productId" />
-                <button type="submit" value="Add to Cart" class="add-to-cart">Add to Cart</button>
-            </form>
-            <form asp-controller="Favorite" asp-action="Add" method="post">
-                <input type="hidden" value="@Model.ID" name="productId" />
-                <button type="submit" value="Add to Favorites" class="add-to-cart">Add to Favorites</button>
-            </form>
-        </div>
+<div class="row p-3 shadow rounded">
+  <div class="col-sm-12 col-md-8 col-lg-5 g-3 d-flex">
+    <div>
+      @foreach (var image in Model.Images)
+      {
+        @* <div class="col-md-4"> *@
+        <img class="image-small me-2" src="/@image.ImageUrl" alt="@Model.Name" style="display:block" onclick="changeImage('@image.ImageUrl')"/>
+          @* </div> *@
+      }
     </div>
+    <div class="main-image-container">
+      <img class="image me-2" id="main-image" src="/@Model.Images[0].ImageUrl" alt="@Model.Name" />
+    </div>
+  </div>
+  
+
+  <div id="cart-text" class="col-sm-12 col-md-4 col-lg-7 g-3">
+    <button class="free-shipping">Free shipping</button>
+    <h2>@Model.Name</h2>
+    <h4>@Model.Description</h4>
+    <h1>Rs. @Model.Price</h1>
+
+    <div class="row gap-2">
+      <div class="col-sm-12 col-lg-6">
+        <form asp-controller="Cart" asp-action="Add" method="post">
+            <input type="hidden" value="@Model.ID" name="productId" />
+            <button type="submit" value="Add to Cart" class="add-to-cart">Add to Cart</button>
+        </form>
+        <form asp-controller="Favorite" asp-action="Add" method="post">
+            <input type="hidden" value="@Model.ID" name="productId" />
+            <button type="submit" value="Add to Favorites" class="add-to-cart">Add to Favorites</button>
+        </form>
+      </div>
+    </div>
+</div>
+
+  </div>
+</div>
+
+<script>
+  const mainImage = document.getElementById("main-image");
+  const changeImage = (url) => {
+    mainImage.src =  new URL(url,location.origin).pathname
+  }
+
+</script>
     
 <style>
 .image {
-  height: 15rem;
+  height: 20rem;
 }
 
-#cart-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
+.image-small {
+  height: 4.9rem;
+  margin-bottom: 5px;
+  border-radius: 0.4rem;
 }
+
+.image-small:hover {
+  background-color: gray;
+  opacity: 0.7;
+}
+
+.main-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+  @* #cart-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  } *@
 
 .free-shipping {
   font-family: "Lato", sans-serif;
@@ -93,6 +138,7 @@ h4 {
   border-radius: 0.4rem;
   margin-bottom: 1rem;
   cursor: pointer;
+  padding: 0 1rem;
 }
 
 .add-to-cart:active {
@@ -114,5 +160,9 @@ h3 i {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.form {
+  display: inline-block;
 }
 </style>
