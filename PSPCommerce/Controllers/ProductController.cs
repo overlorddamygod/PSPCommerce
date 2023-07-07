@@ -58,10 +58,7 @@ namespace PSPCommerce.Controllers
         // POST: product/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-
+        [HttpPost,ValidateAntiForgeryToken,Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Name,Price,CategoryID,Description,ID")] Product product, IFormFile imageFile)
         {
             // log model state errors
@@ -117,7 +114,8 @@ namespace PSPCommerce.Controllers
             ViewBag.MinPrice = query.minPrice;
             ViewBag.MaxPrice = query.maxPrice;
 
-            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q)).Where(p => p.Price >= query.minPrice && p.Price <= query.maxPrice);
+            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q))
+                .Where(p => p.Price >= query.minPrice && p.Price <= query.maxPrice);
 
             if (query.Category != null)
             {

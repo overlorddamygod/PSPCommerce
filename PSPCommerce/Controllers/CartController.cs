@@ -82,9 +82,7 @@ namespace PSPCommerce.Controllers
             return View(cartItem);
         }
 
-        [HttpPost("/cart/add")]
-        [ValidateAntiForgeryToken]
-        [Authorize]
+        [HttpPost("/cart/add"),ValidateAntiForgeryToken,Authorize]
         public async Task<IActionResult> Add(int productId)
         {
             var user = await _userManager.GetUserAsync(User);
