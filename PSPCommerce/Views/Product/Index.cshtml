@@ -1,7 +1,7 @@
 @model IEnumerable<PSPCommerce.Models.Product>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Products";
 }
 
 <p>
@@ -14,7 +14,7 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
+                @Html.DisplayNameFor(model => model.Images)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Price)
@@ -38,7 +38,7 @@
             </td>
             <td>
                 @*@Html.DisplayFor(modelItem => item.ImageUrl)*@
-                <img src="@item.ImageUrl" alt="@item.Description" height="100" width="100"/>
+                <img src="@item.Images[0].ImageUrl" alt="@item.Description" height="100" width="100"/>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)

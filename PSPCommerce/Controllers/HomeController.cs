@@ -20,7 +20,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var applicationDbContext = _context.Product.Include(p => p._Category);
+        var applicationDbContext = _context.Product.Include(p => p._Category).Include(c => c.Images);
         return View(await applicationDbContext.ToListAsync());
     }
 

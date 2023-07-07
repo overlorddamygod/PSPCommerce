@@ -30,7 +30,7 @@
     @foreach (var item in Model) {
             <tr class="cart-row" data-id="@item.ID" data-price="@item._Product.Price"> 
                 <td>
-                    <img src="/@item._Product.ImageUrl" alt="@item._Product.Description" height="100"/>
+                    <img src="/@item._Product.Images[0].ImageUrl" alt="@item._Product.Description" height="100"/>
                     @Html.DisplayFor(modelItem => item._Product.Name)
                     
                 </td>
