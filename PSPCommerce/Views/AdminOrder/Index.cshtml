@@ -1,0 +1,67 @@
+@model IEnumerable<PSPCommerce.Models.Order>
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<link rel="stylesheet" href="~/css/order.css" />
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+
+@foreach (var order in Model) {
+    <a asp-controller="AdminOrder" asp-action="Details" asp-route-id="@order.ID">
+    <div class="order">
+        <div class="top">
+            <div>
+                Order #@order.ID
+                <div>By @order._User.Email | PaymentID: @order.PaymentIntentID</div>
+                <div class="text-secondary">Placed on @order.CreatedAt.ToString("d' 'MMMM' 'yyyy")</div>
+            </div>
+            <div>
+                @if (@order.IsPaid)
+                {
+                    <span class="text-success">Paid</span>
+                } else {
+                    <span class="text-danger">Payment Pending</span>
+                }
+            </div>
+        </div>
+        <div class="main">
+            @foreach (var item in order._OrderItems)
+            {
+                <a asp-controller="Product" asp-action="Details" asp-route-id="@item._Product.ID">
+                    <div class="order-item">
+                        <div>
+                            <img src="/@item._Product.Images[0].ImageUrl" alt="@item._Product.Name" />
+                        </div>
+                        <div class="product">
+                            @item._Product.Name
+                        </div>
+                        <div class="quantity">Qty: @item.Quantity</div>
+                        <div>
+                            Price:
+                            <div>Rs.@(item._Product.Price * item.Quantity)</div>
+                        </div>
+                    </div>
+                </a>
+            }
+            <div class="d-flex justify-content-between">
+                <div class="total">
+                    <div>Total</div>
+                    <div>Rs.@order.TotalPrice</div>
+                </div>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@order.ID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@order.ID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@order.ID">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </a>
+}

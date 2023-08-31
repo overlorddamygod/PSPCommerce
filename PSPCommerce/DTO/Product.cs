@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using PSPCommerce.DTO;
 
 public class ProductSearchParamsDto
-{   
+{
     public string? Q { get; set; } = String.Empty;
 
     [Range(1, int.MaxValue)]

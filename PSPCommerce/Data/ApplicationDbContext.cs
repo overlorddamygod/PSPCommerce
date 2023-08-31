@@ -11,6 +11,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     {
     }
     public DbSet<Product> Product { get; set; } = default!;
+    public DbSet<ProductImage> ProductImage { get; set; } = default!;
     public DbSet<CartItem> CartItem { get; set; } = default!;
     public DbSet<Favorites> Favorite { get; set; } = default!;
     public DbSet<Category> Category { get; set; } = default!;

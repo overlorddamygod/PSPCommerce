@@ -17,7 +17,7 @@ namespace PSPCommerce.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
 
-        public FavoriteController(ApplicationDbContext context,UserManager<User> userManager)
+        public FavoriteController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -29,12 +29,12 @@ namespace PSPCommerce.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            var applicationDbContext = _context.Favorite.Where(fav => fav.UserID == user.Id).Include(f => f._Product).Include(f => f._User);
+            var applicationDbContext = _context.Favorite.Where(fav => fav.UserID == user.Id).Include(f => f._Product).ThenInclude(c => c.Images).Include(f => f._User);
             return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Favorite/Details/5
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -56,7 +56,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Favorite/Create
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public IActionResult Create()
         {
@@ -70,7 +70,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Create([Bind("ProductID,UserID,ID")] Favorites favorites)
         {
@@ -117,7 +117,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Favorite/Edit/5
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -141,7 +141,7 @@ namespace PSPCommerce.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-                [Authorize(Roles="Admin")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Edit(int id, [Bind("ProductID,UserID,ID")] Favorites favorites)
         {
@@ -210,14 +210,14 @@ namespace PSPCommerce.Controllers
             {
                 _context.Favorite.Remove(favorites);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool FavoritesExists(int id)
         {
-          return (_context.Favorite?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Favorite?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }

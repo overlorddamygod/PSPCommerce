@@ -11,7 +11,7 @@ using PSPCommerce.Models;
 
 namespace PSPCommerce.Controllers
 {
-    [Authorize(Roles="Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +22,7 @@ namespace PSPCommerce.Controllers
         }
 
         // GET: Category
-        
+
         public async Task<IActionResult> Index()
         {
             return _context.Category != null ?
