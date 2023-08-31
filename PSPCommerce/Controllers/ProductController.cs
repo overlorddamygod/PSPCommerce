@@ -137,7 +137,8 @@ namespace PSPCommerce.Controllers
             ViewBag.MinPrice = query.minPrice;
             ViewBag.MaxPrice = query.maxPrice;
 
-            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q)).Where(p => p.Price >= query.minPrice && p.Price <= query.maxPrice);
+            var products = _context.Product.Where(p => p.Name.ToLower().Contains(q) || p.Description.ToLower().Contains(q))
+                .Where(p => p.Price >= query.minPrice && p.Price <= query.maxPrice);
 
             if (query.Category != null)
             {
