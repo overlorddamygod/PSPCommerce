@@ -6,6 +6,7 @@ An E-commerce site built using ASP.NET MVC for 6th sem College Project
 - [ASP.NET MVC](https://dotnet.microsoft.com/en-us/apps/aspnet/mvc) A web application framework developed by Microsoft that implements the MVC pattern
 - [Bootstrap](https://getbootstrap.com/) CSS framework
 - [Stripe](https://stripe.com) Payment Service Provider
+- [Microsoft Azure App Service](https://azure.microsoft.com/en-us/products/app-service) Fully managed platform to build and host web applications
 
 ## Features
 
