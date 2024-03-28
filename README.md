@@ -16,6 +16,8 @@ An E-commerce site built using ASP.NET MVC for 6th sem College Project
 
 ## Running the site
 
+Add Database ConnectionString and Stripe API key in [appsettings.json](/PSPCommerce/appsettings.json)
+
 ```bash
 # Run development server
 dotnet run PSPCommerce
@@ -23,7 +25,7 @@ dotnet run PSPCommerce
 
 ## Site Screenshots
 
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
   <img src="./screenshots/home.png" alt="HomePage" style="width: 100%;">
   <img src="./screenshots/register.png" alt="RegisterPage" style="width: 100%;">
   <img src="./screenshots/login.png" alt="LoginPage" style="width: 100%;">
